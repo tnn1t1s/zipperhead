@@ -1,9 +1,0 @@
-Metadata-Version: 2.2
-Name: zipperhead
-Version: 0.1
-Requires-Dist: numpy
-Requires-Dist: torch
-Requires-Dist: pytest
-Requires-Dist: jupyter
-Requires-Dist: scipy
-Dynamic: requires-dist
