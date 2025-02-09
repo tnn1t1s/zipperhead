@@ -1,0 +1,10 @@
+README.md
+setup.py
+src/data/__init__.py
+src/data/generator.py
+src/models/__init__.py
+src/zipperhead.egg-info/PKG-INFO
+src/zipperhead.egg-info/SOURCES.txt
+src/zipperhead.egg-info/dependency_links.txt
+src/zipperhead.egg-info/requires.txt
+src/zipperhead.egg-info/top_level.txt
