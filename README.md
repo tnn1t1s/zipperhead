@@ -1,17 +1,17 @@
 # Zipperhead
 
 ## Overview
-**Zipperhead** is a toy project designed to explore the differences between **Supervised Fine-Tuning (SFT)** and **Guided Reward Policy Optimization (GRPO)** for base models. The goal is to learn how reinforcement learning techniques can be applied to fine-tune a simple sequence-to-sequence (Seq2Seq) model trained on generated mathematical problems.
+**Zipperhead** is a toy project designed to explore the differences between **Supervised Fine-Tuning (SFT)** and **Guided Reward Policy Optimization (GRPO)** for base models. The goal is to learn how reinforcement learning techniques can be applied to fine-tune a simple model trained on generated mathematical problems.
 
 ## Experiment Setup
 
 ### Objective
-The primary objective is to assess the impact of **GRPO** on a distilled model trained on a biased dataset. We will use a custom **Seq2Seq model** trained on a small, synthetic dataset of mathematical problems to iterate efficiently and compare the performance of **SFT** and **GRPO**.
+The primary objective is to assess the impact of **GRPO** on a distilled model trained on a biased dataset. We will use a custom **model** trained on a small, synthetic dataset of mathematical problems to iterate efficiently and compare the performance of **SFT** and **GRPO**.
 
 ### Methodology
 
 #### Model Structure
-We use a simple **autoencoder-style Seq2Seq model** for experimentation purposes.
+We use a simple **autoencoder-style model** for experimentation purposes, then introduce a transformer model for comparison.
 
 #### Data Generation
 We generate two datasets to test different training scenarios:
