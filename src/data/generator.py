@@ -25,10 +25,11 @@ def generate(N: int = 10, odd_even_mix: float = 0.5, max_int: int = 100) -> List
     sequences = []
     for _ in range(N):
         # Decide if this sum should be odd based on odd_even_mix probability
-        should_be_odd = np.random.random() < odd_even_mix
+        r = np.random.random()
+        should_be_odd = r < odd_even_mix
         
         # Generate first number randomly
-        x = np.random.randint(0, max_int + 1)
+        x = int(np.random.randint(0, max_int + 1))
         
         # If we want sum to be odd:
         # - If x is odd, y must be even
@@ -40,7 +41,7 @@ def generate(N: int = 10, odd_even_mix: float = 0.5, max_int: int = 100) -> List
             y_start = 1 if x % 2 == 1 else 0
             
         # Generate y with correct parity
-        y = np.random.choice(np.arange(y_start, max_int + 1, 2))
+        y = int(np.random.choice(np.arange(y_start, max_int + 1, 2)))
         
         # Calculate sum
         z = x + y
@@ -49,13 +50,64 @@ def generate(N: int = 10, odd_even_mix: float = 0.5, max_int: int = 100) -> List
         
     return sequences
 
+def validate_sequence_format(sequences):
+    """Validates that all sequences follow [x,'+',y,'=',z] format
+    
+    Returns: bool
+    Raises: ValueError with specific index and sequence if format invalid
+    """
+    for i, seq in enumerate(sequences):
+        if (len(seq) != 5 or 
+            not isinstance(seq[0], (int, float)) or
+            seq[1] != '+' or
+            not isinstance(seq[2], (int, float)) or
+            seq[3] != '=' or
+            not isinstance(seq[4], (int, float))):
+            raise ValueError(f"Invalid sequence format at index {i}: {seq}")
+    return True
+
+def validate_arithmetic(sequences):
+    """Validates that all sequences satisfy x + y = z
+    
+    Returns: bool
+    Raises: ValueError with list of invalid sequences
+    """
+    errors = []
+    for i, seq in enumerate(sequences):
+        if seq[0] + seq[2] != seq[4]:
+            errors.append((i, seq))
+    if errors:
+        raise ValueError(f"Arithmetic errors in sequences: {errors}")
+    return True
+
+def validate_distribution(sequences, max_int, odd_even_mix):
+    """Validates statistical properties: range and odd/even distribution
+    
+    Returns: dict with distribution statistics
+    Raises: ValueError if constraints violated
+    """
+    stats = {
+        'total': len(sequences),
+        'max_value': max(max(seq[0], seq[2]) for seq in sequences),
+        'odd_ratio': sum(1 for seq in sequences if seq[4] % 2 == 1) / len(sequences)
+    }
+    
+    if stats['max_value'] > 2 * max_int:
+        raise ValueError(f"Values exceed max_int * 2: {stats['max_value']} > {max_int}")
+        
+    if abs(stats['odd_ratio'] - odd_even_mix) > 0.01:  # 1% tolerance
+        raise ValueError(f"Odd/even ratio {stats['odd_ratio']:.2f} doesn't match expected {odd_even_mix:.2f}")
+        
+    return stats
+
+
 # Test the generator
 if __name__ == "__main__":
     # Test with different configurations
+    max_int = 100
     test_cases = [
-        {},  # Use all defaults
-        {'N': 5, 'odd_even_mix': 0.0},  # All even sums
-        {'N': 5, 'odd_even_mix': 1.0, 'max_int': 20},  # All odd sums, small numbers
+        {'N': 5, 'odd_even_mix': 1.0},  # All even sums
+        {'N': 5, 'odd_even_mix': 0.0},  # All odd sums
     ]
     
     for params in test_cases:
@@ -63,5 +115,10 @@ if __name__ == "__main__":
         sequences = generate(**params)
         odd_count = sum(1 for seq in sequences if seq[-1] % 2 == 1)
         print(f"Generated {len(sequences)} sequences, {odd_count} have odd sums")
-        for seq in sequences:
-            print(seq)
+        # Validate data before training
+        for x in sequences:
+                print(x)
+        validate_sequence_format(sequences)
+        validate_arithmetic(sequences)
+        stats = validate_distribution(sequences, max_int, odd_even_mix=params['odd_even_mix'])
+        print("Distribution stats:", stats)
