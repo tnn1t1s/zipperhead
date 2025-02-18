@@ -55,7 +55,7 @@ We experiment with several key hyperparameters to optimize the model’s perform
 ### Code Structure
 The implementation includes the following components:
 
-1. **Model Definition:** A simple `Seq2Seq` autoencoder.
+1. **Model Definition:** A simple autoencoder / decoder
 2. **Data Generation:** Functions to create biased and full datasets.
 3. **Training Functions:**
    - **SFT Training:** Uses supervised loss to train on biased and full datasets.

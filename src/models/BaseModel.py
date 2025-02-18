@@ -17,12 +17,12 @@ class BaseModel(nn.Module):
             max_int (int): The maximum integer value expected in the arithmetic expressions.
                 This value is used to determine the size of the vocabulary.
         """
-        Automatically sizes network based on information content
-        
-        Args:
-            max_int: the maximum size of x and y values
-        """
         super().__init__()
+
+        # Get the device
+        self.device = torch.device("mps" if torch.backends.mps.is_available() else 
+                                 "cuda" if torch.cuda.is_available() else "cpu")
+        print(f"Using device: {self.device}")
        
         vocab_size = (2 * max_int) + 3 # +3 for 0, + and = 
         # Calculate minimal dimensions based on information content
@@ -36,18 +36,20 @@ class BaseModel(nn.Module):
             nn.ReLU(),
             nn.Linear(hidden_dim, vocab_size)
         )
+        self.to(self.device)
         
     def forward(self, tokens: torch.Tensor) -> torch.Tensor:
+        tokens = tokens.to(self.device)
         embedded = self.embedding(tokens)
         flattened = embedded.reshape(embedded.shape[0], -1)
         return self.seq(flattened)
     
     def predict(self, tokens: torch.Tensor) -> torch.Tensor:
         with torch.no_grad():
-            return self.forward(tokens).argmax(dim=-1)
+            return self.forward(tokens).argmax(dim=-1).cpu()
 
     def save(self, path: str):
         torch.save(self.state_dict(), path)
     
     def load(self, path: str):
-        self.load_state_dict(torch.load(path))
+        self.load_state_dict(torch.load(path), mp_location=self.device())

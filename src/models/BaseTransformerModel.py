@@ -3,7 +3,7 @@ import torch.nn as nn
 import math
 
 class BaseTransformerModel(nn.Module):
-    def __init__(self, max_int: int = 50):
+    def __init__(self, max_int: int = 50, multiplier: int = 2):
         """Simple Transformer model for arithmetic sequence prediction
         Automatically sizes network based on information content
         
@@ -12,13 +12,17 @@ class BaseTransformerModel(nn.Module):
                     Vocab will be sized to handle sums up to 2*max_int
         """
         super().__init__()
+
+        # multiply the size of network for scaling experiment.
+        self.multiplier = multiplier
         
         # Vocab size needs to handle: numbers up to 2*max_int + operators
         self.vocab_size = (2 * max_int) + 3  # +3 for 0 and two operators
         
         # Calculate dimensions based on information content
         info_per_token = math.ceil(math.log2(self.vocab_size))
-        self.d_model = 2 ** math.ceil(math.log2(info_per_token * 4))  # Power of 2, 4x info content
+        # Power of 2, 4x info content
+        self.d_model = self.multiplier ** math.ceil(math.log2(info_per_token * 4))  # Power of 2, 4x info content
         
         # Transformer components
         self.embedding = nn.Embedding(self.vocab_size, self.d_model)
@@ -44,15 +48,13 @@ class BaseTransformerModel(nn.Module):
         Returns:
             Logits for next token prediction [batch_size, vocab_size]
         """
-        # Create padding mask for transformer
-        padding_mask = (tokens == 0)  # Assuming 0 is pad token
         
         # Embed and add positional encoding
         x = self.embedding(tokens) * math.sqrt(self.d_model)
         x = self.pos_encoding(x)
         
         # Pass through transformer
-        x = self.transformer(x, src_key_padding_mask=padding_mask)
+        x = self.transformer(x)
         
         # Use last token's representation for prediction
         x = x[:, -1]  # [batch_size, d_model]

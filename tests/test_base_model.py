@@ -4,24 +4,48 @@ from torch.utils.data import DataLoader, TensorDataset
 from models.BaseModel import BaseModel
 from data.generator import generate
 
-def create_training_data(N=10000, max_int=50):
-    """Create training data with odd sums"""
-    sequences = generate(N=N, odd_even_mix=1.0, max_int=max_int)
+def get_device():
+    """Get the appropriate device for training"""
+    if torch.backends.mps.is_available():
+        return torch.device("mps")
+    elif torch.cuda.is_available():
+        return torch.device("cuda")
+    return torch.device("cpu")
+
+def create_training_data(N=10000, max_int=50, odd_even_mix=0.5, device = None):
+    """Create training data with odd sums
+
+    Args:
+        N: Number of sequences to generate
+           defaults to 99.7% confidence of staying within ±1.5% of target ratio
+        max_int: Maximum integer value in sequences
+    """
+
+    sequences = generate(N=N, odd_even_mix=odd_even_mix, max_int=max_int)
     x_data = torch.tensor([[seq[0], 1, seq[2], 2] for seq in sequences])
     y_data = torch.tensor([seq[4] for seq in sequences])
+
+    if device is not None:
+        x_data = x_data.to(device)
+        y_data = y_data.to(device)
+
     return TensorDataset(x_data, y_data)
 
 def test_train_odd_sums():
     """Test model training and evaluation on odd-sum sequences"""
     max_int = 50
+    device = get_device()
     
     # Create and setup training data
-    train_data = create_training_data(N=10000, max_int=max_int)
+    train_data = create_training_data(N=10000,
+                                      max_int=max_int,
+                                      odd_even_mix = 1.0,
+                                      device = device)
     train_loader = DataLoader(train_data, batch_size=32, shuffle=True)
     
     # Initialize model
     model = BaseModel(max_int=max_int)
-    optimizer = torch.optim.Adam(model.parameters())
+    optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     criterion = torch.nn.CrossEntropyLoss()
     
     # Training loop
@@ -50,7 +74,7 @@ def test_train_odd_sums():
     for seq in test_sequences:
         x_data = torch.tensor([[seq[0], 1, seq[2], 2]])
         with torch.no_grad():
-            pred = model.predict(x_data).item()
+            pred = model.predict(x_data).cpu().item()
             correct += (pred == seq[4])
             print(f"Input: {seq[0]} + {seq[2]} = {seq[4]}")
             print(f"Predicted: {pred}")
@@ -78,7 +102,7 @@ def test_train_odd_sums():
             logits = model(x_data)[0]
             top_k = torch.topk(logits, k=3)
             print("Top 3 predictions (value, logit):")
-            for value, logit in zip(top_k.indices, top_k.values):
+            for value, logit in zip(top_k.indices.cpu(), top_k.values.cpu()):
                 print(f"{value.item()}: {logit.item():.2f}")
             assert pred == expected, f"Failed on {inputs}, got {pred}, expected {expected}"
 
