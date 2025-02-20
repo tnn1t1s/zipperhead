@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import TensorDataset, ConcatDataset
-from models.MinimalTransformer import MinimalTransformer
+from models.BaseTransformerModel import BaseTransformerModel
 from data.generator import generate
 from trainer import Trainer
 import json
@@ -21,7 +21,7 @@ def load_base_model(model_info_path):
     
     # Create model with same hyperparameters
     hp = info['hyperparameters']
-    model = MinimalTransformer(
+    model = BaseTransformerModel(
         max_int=hp['max_int'],
         embed_dim=hp['embed_dim'],
         device=get_device()

@@ -1,6 +1,6 @@
 import torch
 from torch.utils.data import TensorDataset
-from models.MinimalTransformer import MinimalTransformer
+from models.BaseTransformerModel import BaseTransformerModel
 from data.generator import generate
 from trainer import Trainer
 from pathlib import Path
@@ -82,7 +82,7 @@ def create_base_model(
     print(f"Created datasets - Train size: {len(train_data)}, Val size: {len(val_data)}")
     
     # Initialize model
-    model = MinimalTransformer(max_int=max_int, embed_dim=embed_dim, device=device)
+    model = BaseTransformerModel(max_int=max_int, embed_dim=embed_dim, device=device)
     
     # Setup trainer
     trainer = Trainer(
