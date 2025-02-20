@@ -1,7 +1,7 @@
 # Zipperhead
 
 ## Overview
-**Zipperhead** is a roject designed to explore the differences between **Supervised Fine-Tuning (SFT)** and **Guided Reward Policy Optimization (GRPO)** for base models. The goal is to learn how reinforcement learning techniques can be applied to fine-tune a simple model trained on generated mathematical problems.
+**Zipperhead** is a project designed to explore the differences between **Supervised Fine-Tuning (SFT)** and **Guided Reward Policy Optimization (GRPO)** for base models. The goal is to learn how reinforcement learning techniques can be applied to fine-tune a simple model trained on generated mathematical problems.
 
 ## Experiment Setup
 
