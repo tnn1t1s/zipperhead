@@ -1,7 +1,7 @@
 import pytest
 import numpy as np
 import scipy
-from src.data.generator import generate
+from data.generator import generate
 
 def test_sequence_format():
     """Test that generated sequences have correct format"""
@@ -66,7 +66,7 @@ def test_uniformity_within_parity():
     
     if len(even_x) > 0:
         hist, _ = np.histogram(even_x, bins=n_bins)
-        expected = np.array([len(even_x)/n_bins] * n_bins)  # uniform expectation
+        expected = np.array([len(even_x)/n_bins] * n_bins)  
         _, p_value_even = scipy.stats.chisquare(hist, expected)
         assert p_value_even > 0.001  # Using 0.1% significance level
 

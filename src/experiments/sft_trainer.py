@@ -20,7 +20,7 @@ def evaluate_model(model, odd_data, even_data):
             for x, y in data:
                 x = x.unsqueeze(0).to(model.device)
                 pred = model.predict(x).cpu()
-                correct += (pred.item() == y.item())
+                correct += (pred.item() == y)
         results[name] = 100. * correct / total
     
     return results
